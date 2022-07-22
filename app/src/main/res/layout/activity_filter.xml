@@ -4,28 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
+    tools:context=".FilterActivity">
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginTop="30dp"
-        android:text="Hello World!"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/image" />
 
     <Button
-        android:id="@+id/btn_load"
+        android:id="@+id/btn_pick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Load Image"
+        android:text="Pick Image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
+    <Spinner
+        android:id="@+id/spinner_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Filter Image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/btn_pick" />
 
     <TextView
         android:id="@+id/textview"
@@ -35,7 +44,7 @@
         android:text="status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_load" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_pick" />
 
     <TextView
         android:id="@+id/textview2"
@@ -43,20 +52,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="status"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview" />
-
-    <Button
-        android:id="@+id/navigate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go to Filter screen"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview2"
-        android:layout_marginTop="20dp"
-        />
-
+        app:layout_constraintTop_toBottomOf="@+id/spinner_filter" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

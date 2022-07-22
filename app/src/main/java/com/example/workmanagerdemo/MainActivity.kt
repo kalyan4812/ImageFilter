@@ -13,6 +13,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.bumptech.glide.Glide
+import com.example.workmanagerdemo.databinding.ActivityMainBinding
 import com.example.workmanagerdemo.utils.WorkerKeys
 import com.example.workmanagerdemo.workmanger.DownloadWorker
 import com.example.workmanagerdemo.workmanger.ImageFilterWorker
@@ -30,12 +31,15 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var imageuri: MutableLiveData<Uri>
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var originalImage:String
 
     private lateinit var color_filter_request: OneTimeWorkRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         imageuri = MutableLiveData()
 
 
@@ -49,18 +53,19 @@ class MainActivity : AppCompatActivity() {
 
 
         workManager.getWorkInfoByIdLiveData(download_request.id).observe(this) {
-            textview.text = when (it?.state) {
+            binding.textview.text = when (it?.state) {
                 WorkInfo.State.RUNNING -> "Downloading..."
                 WorkInfo.State.SUCCEEDED -> "SUCCESSS.."
                 WorkInfo.State.FAILED -> "FAILED...."
                 else -> "Please wait...."
             }
             val uri = it.outputData?.getString(WorkerKeys.IMAGE_URI)?.toUri()
+            originalImage=uri.toString()
             imageuri.postValue(uri)
 
         }
         workManager.getWorkInfoByIdLiveData(color_filter_request.id).observe(this) {
-            textview2.text = when (it?.state) {
+            binding.textview2.text = when (it?.state) {
                 WorkInfo.State.RUNNING -> "Filtering..."
                 WorkInfo.State.SUCCEEDED -> "Filter SUCCESSS.."
                 WorkInfo.State.FAILED -> "Filter FAILED...."
@@ -73,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        btn_load.setOnClickListener {
+        binding.btnLoad.setOnClickListener {
 //            workManager.beginUniqueWork("download", ExistingWorkPolicy.KEEP, download_request)
 //                .then(color_filter_request).enqueue()
             workManager.beginWith(download_request).then(color_filter_request).enqueue()
@@ -84,8 +89,12 @@ class MainActivity : AppCompatActivity() {
 
                 Glide.with(applicationContext)
                     .load(it) // Uri of the picture
-                    .into(imageView);
+                    .into(binding.imageView);
             }
+        }
+
+        binding.navigate.setOnClickListener {
+            startActivity(Intent(this, FilterActivity::class.java))
         }
 
 

@@ -16,30 +16,27 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
-
-class ImageFilterWorker(
+class NewImageFilterWorker(
     private val context: Context,
     private val workerParameters: WorkerParameters
 ) :
     CoroutineWorker(context, workerParameters) {
     @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun doWork(): Result {
+
+        val data = inputData
+        val filterKey = data.getString("filter_key")
+        val imageUri = data.getString("imageUri")
         val image_file =
-            workerParameters.inputData.getString(WorkerKeys.IMAGE_URI)?.toUri()?.toFile()
+            imageUri?.toUri()?.toFile()
 
-        delay(500L)
-
+        println(image_file)
+        println(image_file?.absolutePath)
         return image_file?.let { file ->
-            val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+            val bitmap = BitmapFactory.decodeFile(file.path)
             var filtered_bitmap = bitmap.copy(bitmap.config, true)
-            val paint = Paint()
-            paint.colorFilter = LightingColorFilter(0xFFDD000, 5)
-
-            val canvas = Canvas(filtered_bitmap)
-            canvas.drawBitmap(filtered_bitmap, 0f, 0f, paint)
-
             withContext(Dispatchers.IO) {
-                filtered_bitmap = callFilterFunUsingKey("Invert", filtered_bitmap)
+                filtered_bitmap = callFilterFunUsingKey(filterKey!!, filtered_bitmap)
                 val result_file = File(context.cacheDir, "filter_workmanager.jpg")
                 val outputstream = FileOutputStream(result_file)
                 val success = filtered_bitmap.compress(
@@ -57,6 +54,7 @@ class ImageFilterWorker(
             }
         } ?: Result.failure()
     }
+
 
     fun callFilterFunUsingKey(filter: String, bitmap: Bitmap): Bitmap {
         return when (filter) {
