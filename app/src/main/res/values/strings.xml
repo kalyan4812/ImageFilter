@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WorkManagerDemo</string>
+    <string name="app_name">ImageFiterApp</string>
     <string name="image">image</string>
     <string name="Please_pick_an_image">Please pick an image</string>
 </resources>

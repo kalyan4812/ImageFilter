@@ -45,7 +45,8 @@ class NewImageFilterWorker(
                 if (success) {
                     Result.success(
                         workDataOf(
-                            WorkerKeys.FILTER_IMAGE_URI to result_file.toUri().toString()
+                            WorkerKeys.FILTER_IMAGE_URI to result_file.toUri().toString(),
+                            WorkerKeys.NEW_IMAGE_URI to result_file.absolutePath
                         )
                     )
                 } else {
