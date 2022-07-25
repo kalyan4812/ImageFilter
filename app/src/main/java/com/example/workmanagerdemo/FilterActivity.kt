@@ -30,6 +30,7 @@ import kotlinx.android.synthetic.main.activity_filter.textview2
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 
@@ -168,18 +169,23 @@ class FilterActivity : AppCompatActivity() {
 
     private var filtered_image: String? = null
     private fun createFileInExternalStorage() {
-        val bitmap = BitmapFactory.decodeFile(filtered_image)
-        var outStream: FileOutputStream? = null
-        val sdCard = Environment.getExternalStorageDirectory()
-        val dir = File(sdCard.absolutePath + "/FilterImages")
-        dir.mkdirs()
-        val fileName = String.format("%d.jpg", System.currentTimeMillis())
-        val outFile = File(dir, fileName)
-        outStream = FileOutputStream(outFile)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
-        outStream.flush()
-        outStream.close()
-        Toast.makeText(applicationContext, "Saved successfully...", Toast.LENGTH_SHORT).show()
+        try {
+            val bitmap = BitmapFactory.decodeFile(filtered_image)
+            var outStream: FileOutputStream? = null
+            val sdCard = Environment.getExternalStorageDirectory()
+            val dir = File(sdCard.absolutePath + "/FilterImages")
+            dir.mkdirs()
+            val fileName = String.format("%d.jpg", System.currentTimeMillis())
+            val outFile = File(dir, fileName)
+            outStream = FileOutputStream(outFile)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+            outStream.flush()
+            outStream.close()
+            Toast.makeText(applicationContext, "Saved successfully...", Toast.LENGTH_SHORT).show()
+        }
+        catch (e:Exception){
+            Toast.makeText(applicationContext, "Failed to save the image.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun observeData() {
