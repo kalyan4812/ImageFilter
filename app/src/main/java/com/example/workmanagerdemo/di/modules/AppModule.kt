@@ -2,6 +2,7 @@ package com.example.workmanagerdemo.di.modules
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.example.workmanagerdemo.FilterRepository
 import com.example.workmanagerdemo.remote_data.FileApi
 import dagger.Module
 import dagger.Provides
@@ -26,5 +27,11 @@ object AppModule {
     @Provides
     fun getWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRepository(workManager: WorkManager): FilterRepository {
+        return FilterRepository(workManager)
     }
 }

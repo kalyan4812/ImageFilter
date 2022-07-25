@@ -2,4 +2,6 @@
     <string name="app_name">ImageFiterApp</string>
     <string name="image">image</string>
     <string name="Please_pick_an_image">Please pick an image</string>
+    <string name="attach_image">Attaching Image....</string>
+    <string name="failed_to_attach_image">Failed to attach the Image....</string>
 </resources>
