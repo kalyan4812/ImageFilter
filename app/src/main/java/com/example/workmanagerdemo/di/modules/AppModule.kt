@@ -2,7 +2,7 @@ package com.example.workmanagerdemo.di.modules
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.example.workmanagerdemo.FilterRepository
+import com.example.workmanagerdemo.repository.FilterRepository
 import com.example.workmanagerdemo.remote_data.FileApi
 import dagger.Module
 import dagger.Provides

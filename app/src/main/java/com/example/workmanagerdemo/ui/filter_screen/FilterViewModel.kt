@@ -1,9 +1,10 @@
-package com.example.workmanagerdemo
+package com.example.workmanagerdemo.ui.filter_screen
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
+import com.example.workmanagerdemo.repository.FilterRepository
 import com.example.workmanagerdemo.utils.UIEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

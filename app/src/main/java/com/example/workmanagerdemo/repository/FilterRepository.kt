@@ -1,4 +1,4 @@
-package com.example.workmanagerdemo
+package com.example.workmanagerdemo.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

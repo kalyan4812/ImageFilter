@@ -1,16 +1,12 @@
-package com.example.workmanagerdemo
+package com.example.workmanagerdemo.ui.filter_screen
 
-import android.Manifest
-import android.Manifest.permission.*
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.R
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -19,32 +15,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ComponentActivity
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.work.*
-import com.example.workmanagerdemo.R.*
+import androidx.work.WorkInfo
+import com.example.workmanagerdemo.R.string
 import com.example.workmanagerdemo.databinding.ActivityFilterBinding
+import com.example.workmanagerdemo.utils.Constants
 import com.example.workmanagerdemo.utils.TryHandler.exceptionalCode
 import com.example.workmanagerdemo.utils.TryHandler.ifError
 import com.example.workmanagerdemo.utils.UIEvent
+import com.example.workmanagerdemo.utils.URIPathHelper
 import com.example.workmanagerdemo.utils.WorkerKeys
-import com.example.workmanagerdemo.workmanger.NewImageFilterWorker
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_filter.*
-import kotlinx.android.synthetic.main.activity_filter.textview2
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileOutputStream
-import java.util.*
-import javax.inject.Inject
-import kotlin.jvm.Throws
 
 
 @AndroidEntryPoint
@@ -96,30 +85,7 @@ class FilterActivity : AppCompatActivity() {
     }
 
     private fun setUpSpinner() {
-        values = listOf(
-            "Apply Filter",
-            "original",
-            "Rotate",
-            "Flip",
-            "Emoboss",
-            "Cfilter",
-            "Gaussian",
-            "Cdepth",
-            "Sharpen",
-            "Noise",
-            "Brightness",
-            "Sepia",
-            "Gamma",
-            "Contrast",
-            "Saturation",
-            "Grayscale",
-            "Vignette",
-            "Hue",
-            "Tint",
-            "Invert",
-            "Boost",
-            "Sketch",
-        )
+        values = Constants.SPINNER_VALUES
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
             this,
             R.layout.simple_spinner_dropdown_item,
@@ -182,6 +148,8 @@ class FilterActivity : AppCompatActivity() {
                     return
                 }
                 binding.textview2.visibility = View.VISIBLE
+                binding.progressBar.visibility=View.VISIBLE
+                binding.progressPercentage.visibility=View.VISIBLE
                 binding.imageView.setImageURI(originalImage)
                 viewModel.onFilterOption(parent?.selectedItem?.toString()!!, file)
                 observeData()
@@ -215,15 +183,23 @@ class FilterActivity : AppCompatActivity() {
         viewModel.liveImageData().observe(this) {
             val uri = it.outputData.getString(WorkerKeys.FILTER_IMAGE_URI)?.toUri()
             val path = it.outputData.getString(WorkerKeys.NEW_IMAGE_URI)
+            val progress: Int = it.getProgress().getInt("progress", -1)
+
             textview2.text = when (it?.state) {
                 WorkInfo.State.RUNNING -> "Applying filter..."
                 WorkInfo.State.SUCCEEDED -> {
+                    binding.progressBar.visibility=View.GONE
+                    binding.progressPercentage.visibility=View.GONE
                     binding.Download.visibility = View.VISIBLE
                     filtered_image = path
                     "Filter SUCCESSS.."
                 }
                 WorkInfo.State.FAILED -> "Filter FAILED...."
                 else -> "Please wait...."
+            }
+            binding.progressBar.progress=progress
+            if(progress>=0){
+                binding.progressPercentage.text="$progress %"
             }
 
             uri?.let {
@@ -248,7 +224,7 @@ class FilterActivity : AppCompatActivity() {
             exceptionalCode {
                 binding.textview.text = getString(string.attach_image)
                 originalImage = data?.data!!
-                file = File(getPath(originalImage))
+                file = File(URIPathHelper.getPath(this,originalImage))
                 if (file.exists()) {
                     println("file created..........")
                 }
@@ -274,16 +250,6 @@ class FilterActivity : AppCompatActivity() {
                 showToast("Permission Denied")
             }
         }
-
-    private fun getPath(uri: Uri?): String? {
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri!!, projection, null, null, null) ?: return null
-        val column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-        cursor.moveToFirst()
-        val s = cursor.getString(column_index)
-        cursor.close()
-        return s
-    }
 
     private fun showToast(msg: String) {
         Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
