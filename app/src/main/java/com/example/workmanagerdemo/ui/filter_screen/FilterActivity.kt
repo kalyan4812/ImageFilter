@@ -30,15 +30,24 @@ import com.example.workmanagerdemo.utils.WorkerKeys
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_filter.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.coroutines.CoroutineContext
 
 
 @AndroidEntryPoint
-class FilterActivity : AppCompatActivity() {
+class FilterActivity : AppCompatActivity(), CoroutineScope {
 
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+
+    private lateinit var job: Job
     private lateinit var binding: ActivityFilterBinding
 
     private lateinit var imageUri: MutableLiveData<Uri>
@@ -52,6 +61,7 @@ class FilterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityFilterBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        job = Job()
         imageUri = MutableLiveData()
         binding.textview.text = getString(string.Please_pick_an_image)
         setUpSpinner()
@@ -148,8 +158,8 @@ class FilterActivity : AppCompatActivity() {
                     return
                 }
                 binding.textview2.visibility = View.VISIBLE
-                binding.progressBar.visibility=View.VISIBLE
-                binding.progressPercentage.visibility=View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.progressPercentage.visibility = View.VISIBLE
                 binding.imageView.setImageURI(originalImage)
                 viewModel.onFilterOption(parent?.selectedItem?.toString()!!, file)
                 observeData()
@@ -188,8 +198,8 @@ class FilterActivity : AppCompatActivity() {
             textview2.text = when (it?.state) {
                 WorkInfo.State.RUNNING -> "Applying filter..."
                 WorkInfo.State.SUCCEEDED -> {
-                    binding.progressBar.visibility=View.GONE
-                    binding.progressPercentage.visibility=View.GONE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressPercentage.visibility = View.GONE
                     binding.Download.visibility = View.VISIBLE
                     filtered_image = path
                     "Filter SUCCESSS.."
@@ -197,9 +207,9 @@ class FilterActivity : AppCompatActivity() {
                 WorkInfo.State.FAILED -> "Filter FAILED...."
                 else -> "Please wait...."
             }
-            binding.progressBar.progress=progress
-            if(progress>=0){
-                binding.progressPercentage.text="$progress %"
+            binding.progressBar.progress = progress
+            if (progress >= 0) {
+                binding.progressPercentage.text = "$progress %"
             }
 
             uri?.let {
@@ -224,7 +234,7 @@ class FilterActivity : AppCompatActivity() {
             exceptionalCode {
                 binding.textview.text = getString(string.attach_image)
                 originalImage = data?.data!!
-                file = File(URIPathHelper.getPath(this,originalImage))
+                file = File(URIPathHelper.getPath(this, originalImage))
                 if (file.exists()) {
                     println("file created..........")
                 }
@@ -253,5 +263,11 @@ class FilterActivity : AppCompatActivity() {
 
     private fun showToast(msg: String) {
         Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        job.cancel()
+        super.onDestroy()
+
     }
 }
